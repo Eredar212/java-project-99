@@ -32,7 +32,7 @@ public class AuthController {
     public String login(@RequestBody @Valid AuthDTO authDTO) {
         try {
             UserDetails user = userDetailsService.loadUserByUsername(authDTO.getUsername());
-            if (!passwordEncoder.encode(authDTO.getPassword()).equals(user.getPassword())) {
+            if (!passwordEncoder.matches(authDTO.getPassword(), user.getPassword())) {
                 throw new BadCredentialsException("Bad credentials");
             }
         } catch (UsernameNotFoundException exception) {
