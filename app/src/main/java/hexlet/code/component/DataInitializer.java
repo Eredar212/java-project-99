@@ -29,6 +29,5 @@ public class DataInitializer implements ApplicationRunner {
         userData.setEmail(email);
         userData.setPassword("qwerty");
         userService.create(userData);
-
     }
 }

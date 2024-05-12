@@ -18,7 +18,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
-// BEGIN
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -39,6 +38,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Разрешаем доступ только к /api/login, чтобы аутентифицироваться и получить токен
+                        .requestMatchers("/").permitAll()
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .anyRequest().authenticated())
@@ -62,4 +62,3 @@ public class SecurityConfig {
         return provider;
     }
 }
-// END
