@@ -8,22 +8,17 @@ import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class UserService {
-    // BEGIN
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private UserMapper userMapper;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     public List<UserDTO> findAll() {
         return userMapper.map(userRepository.findAll());
@@ -54,5 +49,4 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %s not found", id)));
         userRepository.deleteById(id);
     }
-    // END
 }

@@ -3,8 +3,9 @@ package hexlet.code.controller;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserUpdateDTO;
+import hexlet.code.repository.UserRepository;
 import hexlet.code.service.UserService;
-import hexlet.code.utils.UserUtils;
+import jakarta.persistence.Cacheable;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private UserUtils userUtils;
+    private UserRepository userRepo;
 
     @GetMapping
     public List<UserDTO> getAllUsers() {
@@ -49,18 +50,15 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("authentication.name == userService.findById(#id).email")
+    @PreAuthorize("authentication.name == @userService.findById(#id).email")
     public UserDTO updateUser(@PathVariable Long id, @RequestBody @Valid UserUpdateDTO userUpdateDTO) {
         return userService.update(userUpdateDTO, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    //@PreAuthorize("authentication.name == userService.findById(#id).email") что то не то, не сработало
+    @PreAuthorize("authentication.name == @userService.findById(#id).email")
     public ResponseEntity deleteUser(@PathVariable Long id) {
-        if (!userUtils.getCurrentUser().getEmail().equals(userService.findById(id).getEmail())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
