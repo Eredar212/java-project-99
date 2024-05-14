@@ -49,6 +49,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(mvc.pattern("/api/login")).permitAll()
                         .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/users")).permitAll()
+                        .requestMatchers(mvc.pattern("/")).permitAll()
+                        .requestMatchers(mvc.pattern("/index.html")).permitAll()
+                        .requestMatchers(mvc.pattern("/assets/**")).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))
