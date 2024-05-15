@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(mvc.pattern("/")).permitAll()
                         .requestMatchers(mvc.pattern("/index.html")).permitAll()
                         .requestMatchers(mvc.pattern("/assets/**")).permitAll()
+                        .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/task_statuses/**")).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer((rs) -> rs.jwt((jwt) -> jwt.decoder(jwtDecoder)))

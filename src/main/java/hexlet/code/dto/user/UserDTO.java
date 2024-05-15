@@ -1,19 +1,22 @@
-package hexlet.code.dto;
+package hexlet.code.dto.user;
 
-import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
+public class UserDTO {
 
-public class UserCreateDTO {
+    private Long id;
+
     private String firstName;
 
     private String lastName;
 
-    @Email
     private String email;
 
-    private String password;
+    private LocalDate createdAt;
+
 }
