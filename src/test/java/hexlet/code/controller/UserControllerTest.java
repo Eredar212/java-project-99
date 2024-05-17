@@ -2,7 +2,10 @@ package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.mapper.UserMapper;
+import hexlet.code.model.Task;
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskRepository;
+import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import hexlet.code.utils.JWTUtils;
@@ -21,9 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -38,6 +41,8 @@ class UserControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     private UserMapper mapper;
@@ -49,6 +54,10 @@ class UserControllerTest {
     private UserUtils userUtils;
 
     @Autowired
+    private TaskStatusRepository statusRepository;
+
+
+    @Autowired
     private AuthController authController;
 
     @Autowired
@@ -58,13 +67,16 @@ class UserControllerTest {
     private JWTUtils jwtUtils;
 
     private User testUser;
+    private Task testTask;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
+    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor tokenTestUser;
 
     @BeforeEach
     public void setUp() {
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
-
+        testTask = Instancio.of(modelGenerator.getTaskModel()).create();
+        tokenTestUser = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
         token = jwt().jwt(builder -> builder.subject(userUtils.getTestUser().getEmail()));
     }
 
@@ -139,5 +151,33 @@ class UserControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testUDeleteNotExistedUser() throws Exception {
+        userRepository.save(testUser);
+        var request = delete("/api/users/{id}", 999).with(token);
+
+        var result = mockMvc.perform(request)
+                .andReturn();
+        var body = result.getResponse()
+                .getContentAsString();
+        var status = result.getResponse().getStatus();
+        System.out.println("STATUS " + status);
+        assertThat(body).contains("User with id 999 not found");
+    }
+
+    @Test
+    public void testUDeleteWithAssignedTask() throws Exception {
+        userRepository.save(testUser);
+        testTask.setTaskStatus(statusRepository.findAll().get(0));
+        testTask.setAssignee(testUser);
+        taskRepository.save(testTask);
+
+        var requestDelUser = delete("/api/users/{id}", testUser.getId()).with(tokenTestUser);
+
+        mockMvc.perform(requestDelUser)
+                .andExpect(status().isMethodNotAllowed());
+
     }
 }

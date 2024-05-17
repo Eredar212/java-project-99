@@ -9,6 +9,7 @@ import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.MethodNotAllowedException;
 
 import java.util.List;
 
@@ -47,6 +48,10 @@ public class TaskStatusService {
     public void delete(Long id) {
         TaskStatus taskStatus = taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("TaskStatus with id %s not found", id)));
+        var tasks = taskStatus.getTasks();
+        if  (tasks != null && !tasks.isEmpty()) {
+            throw new MethodNotAllowedException("Task Status cannot be deleted. Delete linked tasks first.", null);
+        }
         taskStatusRepository.deleteById(id);
     }
 }

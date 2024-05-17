@@ -1,8 +1,9 @@
 package hexlet.code.controller;
 
-import hexlet.code.model.TaskStatus;
+import hexlet.code.model.Task;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
-import hexlet.code.service.TaskStatusService;
+import hexlet.code.service.TaskService;
 import hexlet.code.util.ModelGenerator;
 import hexlet.code.utils.UserUtils;
 import org.instancio.Instancio;
@@ -22,15 +23,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class TaskStatusControllerTest {
+public class TaskControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private TaskStatusService taskStatusService;
+    private TaskService taskService;
 
     @Autowired
-    private TaskStatusRepository taskStatusRepository;
+    private TaskRepository taskRepository;
 
     @Autowired
     private UserUtils userUtils;
@@ -38,47 +39,48 @@ public class TaskStatusControllerTest {
     @Autowired
     private ModelGenerator modelGenerator;
 
+    @Autowired
+    private TaskStatusRepository statusRepository;
+
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
-    private TaskStatus testTask;
+    private Task testTask;
+
 
     @BeforeEach
     public void setUp() {
-        testTask = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        testTask = Instancio.of(modelGenerator.getTaskModel()).create();
         token = jwt().jwt(builder -> builder.subject(userUtils.getTestUser().getEmail()));
     }
 
     @Test
-    public void testIndex() throws Exception {
-        var result = mockMvc.perform(get("/api/task_statuses"))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        var body = result.getResponse().getContentAsString();
-        assertThatJson(body).isArray();
+    public void testIndexWithoutAuth() throws Exception {
+        mockMvc.perform(get("/api/tasks"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void testShow() throws Exception {
+        testTask.setTaskStatus(statusRepository.findAll().get(0));
+        taskRepository.save(testTask);
 
-        taskStatusRepository.save(testTask);
-
-        var request = get("/api/task_statuses/{id}", testTask.getId());
+        var request = get("/api/tasks/{id}", testTask.getId()).with(token);
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
         var body = result.getResponse().getContentAsString();
 
         assertThatJson(body).and(
-                v -> v.node("name").isEqualTo(testTask.getName()),
-                v -> v.node("slug").isEqualTo(testTask.getSlug())
+                v -> v.node("title").isEqualTo(testTask.getName()),
+                v -> v.node("content").isEqualTo(testTask.getDescription())
         );
     }
 
     @Test
     public void testUDeleteWithoutAuth() throws Exception {
-        taskStatusRepository.save(testTask);
-        var request = delete("/api/task_statuses/{id}", testTask.getId());
+        testTask.setTaskStatus(statusRepository.findAll().get(0));
+        taskRepository.save(testTask);
+        var request = delete("/api/tasks/{id}", testTask.getId());
 
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
@@ -86,8 +88,9 @@ public class TaskStatusControllerTest {
 
     @Test
     public void testUDeleteWithAuth() throws Exception {
-        taskStatusRepository.save(testTask);
-        var request = delete("/api/task_statuses/{id}", testTask.getId()).with(token);
+        testTask.setTaskStatus(statusRepository.findAll().get(0));
+        taskRepository.save(testTask);
+        var request = delete("/api/tasks/{id}", testTask.getId()).with(token);
 
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());

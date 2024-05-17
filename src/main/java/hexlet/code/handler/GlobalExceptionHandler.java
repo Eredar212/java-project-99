@@ -1,5 +1,6 @@
 package hexlet.code.handler;
 
+import hexlet.code.exception.LinkedTaskFoundException;
 import hexlet.code.exception.ResourceNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -25,5 +26,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(LinkedTaskFoundException.class)
+    public ResponseEntity<String> handleLinkedTaskFoundException(LinkedTaskFoundException ex) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(ex.getMessage());
     }
 }
