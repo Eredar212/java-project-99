@@ -11,6 +11,7 @@ plugins {
 	jacoco
 	id("com.adarshr.test-logger") version "3.2.0"
 	checkstyle
+	id("io.sentry.jvm.gradle") version "4.6.0"
 }
 
 group = "hexlet.code"
@@ -94,4 +95,18 @@ testlogger {
 	showSkippedStandardStreams = true
 	showFailedStandardStreams = true
 	logLevel = LogLevel.LIFECYCLE
+}
+
+sentry {
+	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+	// This enables source context, allowing you to see your source
+	// code as part of your stack traces in Sentry.
+	includeSourceContext = true
+
+	org = "viktor-xg"
+	projectName = "java-spring-boot"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
+}
+tasks.sentryBundleSourcesJava {
+	enabled = System.getenv("SENTRY_AUTH_TOKEN") != null
 }
