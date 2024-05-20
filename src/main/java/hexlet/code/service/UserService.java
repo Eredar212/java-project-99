@@ -50,7 +50,6 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %s not found", id)));
         var userTasks = user.getTasks();
         if  (userTasks != null && !userTasks.isEmpty()) {
-            System.out.println("User cannot be deleted. Delete assigned tasks first.");
             throw new LinkedTaskFoundException("User cannot be deleted. Delete assigned tasks first.");
         }
         userRepository.deleteById(id);

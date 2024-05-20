@@ -47,8 +47,9 @@ dependencies {
 	implementation("org.apache.maven.reporting:maven-reporting-api:4.0.0-M11")
 	implementation("org.jacoco:jacoco-maven-plugin:0.8.12")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")
-	implementation("org.springdoc:springdoc-openapi-starter-webflux-api:2.4.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
+
 
 	testImplementation("org.springframework.security:spring-security-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

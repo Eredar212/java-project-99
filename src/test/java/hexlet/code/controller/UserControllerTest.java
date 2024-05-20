@@ -178,6 +178,5 @@ class UserControllerTest {
 
         mockMvc.perform(requestDelUser)
                 .andExpect(status().isMethodNotAllowed());
-
     }
 }

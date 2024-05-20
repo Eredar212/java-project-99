@@ -5,6 +5,10 @@ import hexlet.code.dto.user.UserDTO;
 import hexlet.code.dto.user.UserUpdateDTO;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +28,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "Пользователи")
 public class UserController {
 
     @Autowired
@@ -32,6 +37,10 @@ public class UserController {
     @Autowired
     private UserRepository userRepo;
 
+    @Operation(
+            summary = "Получение списка пользователей",
+            description = "Возвращает всех пользователей"
+    )
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.findAll();
@@ -52,13 +61,17 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "JWT")
     @PreAuthorize("authentication.name == @userService.findById(#id).email")
-    public UserDTO updateUser(@PathVariable Long id, @RequestBody @Valid UserUpdateDTO userUpdateDTO) {
+    public UserDTO updateUser(@PathVariable @Parameter(description = "Идентификатор пользователя", required = true)
+                              Long id,
+                              @RequestBody @Parameter(description = "Данные") @Valid UserUpdateDTO userUpdateDTO) {
         return userService.update(userUpdateDTO, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @SecurityRequirement(name = "JWT")
     @PreAuthorize("authentication.name == @userService.findById(#id).email")
     public ResponseEntity deleteUser(@PathVariable Long id) {
         userService.delete(id);

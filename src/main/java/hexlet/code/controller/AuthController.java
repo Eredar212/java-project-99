@@ -3,6 +3,7 @@ package hexlet.code.controller;
 import hexlet.code.dto.AuthDTO;
 import hexlet.code.service.CustomUserDetailsService;
 import hexlet.code.utils.JWTUtils;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Аутентификация")
 public class AuthController {
     @Autowired
     private CustomUserDetailsService userDetailsService;
