@@ -2,6 +2,7 @@ package hexlet.code.controller;
 
 import hexlet.code.dto.task.TaskCreateDTO;
 import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskParamsDTO;
 import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.service.TaskService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -32,8 +33,8 @@ public class TaskController {
     private TaskService taskService;
 
     @GetMapping
-    public ResponseEntity<List<TaskDTO>> getAllTasks() {
-        List<TaskDTO> tasks = taskService.findAll();
+    public ResponseEntity<List<TaskDTO>> getAllTasks(TaskParamsDTO params) {
+        List<TaskDTO> tasks = taskService.findAll(params);
         return ResponseEntity.status(HttpStatus.OK)
                 .header("X-Total-Count", String.valueOf(tasks.size()))
                 .body(tasks);
